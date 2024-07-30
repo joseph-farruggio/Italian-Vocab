@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::create('user_word', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('word_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('word_id')->constrained();
             $table->boolean('archived')->default(false);
             $table->timestamps();
         });

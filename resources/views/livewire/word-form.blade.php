@@ -3,6 +3,7 @@
 use Livewire\Volt\Component;
 use App\Models\Word;
 use OpenAI\Laravel\Facades\OpenAI;
+use Illuminate\Support\Str;
 
 new class extends Component {
     public $word;
@@ -11,19 +12,24 @@ new class extends Component {
     public function save()
     {
 
-        $translation = $this->getTranslation();
-        $this->word = Word::create([
-            'italiano' => $this->word,
-            'english' => $translation['english'],
-            'sentences' => json_encode($translation['sentences'])
-        ]);
+        if (! $word = Word::firstWhere('italiano', Str::title($this->word))) {
+            $translation = $this->getTranslation();
+            $word = Word::create([
+                'italiano' => Str::title($this->word),
+                'english' => $translation['english'],
+                'sentences' => json_encode($translation['sentences'])
+            ]);
+        }
 
-        $user = auth()->user();
-        $user->words()->attach($this->word->id);
+        if (! auth()->user()->words()->where('words.id', $word->id)->exists()) {
+            auth()->user()->words()->attach($word->id);
+            $this->dispatch('flash-message', message: 'Word added! Add another word or <a href="/" class="underline">go study</a>');
+        } else {
+            $this->dispatch('flash-message',  message: 'Word already exists in your list.');
+        }
 
         // Clear the input field
         $this->word = '';
-        $this->dispatch('flash-message');
     }
 
     public function getTranslation($retry = false, $errorMessage = null)
@@ -104,9 +110,9 @@ new class extends Component {
         </x-primary-button>
     </form>
 
-    <div x-data="{ show: false }" x-show="show" x-transition @flash-message.window="show = true; setTimeout(() => show = false, 6000)" style="display: none;">
+    <div x-data="{ show: false, message: null }" x-show="show" x-transition @flash-message.window="show = true; message = $event.detail.message; setTimeout(() => show = false, 6000)" style="display: none;">
         <div class="p-4 rounded-lg mt-4 bg-orange-100">
-            <p>Word added! Add another word or <a href="/" class="underline">go study</a></p>
+            <p x-html="message"></p>
         </div>
     </div>
 </div>

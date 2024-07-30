@@ -1,12 +1,10 @@
 <?php
 
 use Livewire\Volt\Component;
+use Livewire\Attributes\Computed;
 use App\Models\Word;
 
 new class extends Component {
-    public $data = [];
-		public $archiveCount;
-	 	public $message = '';
     public $wordID;
     public $italiano = '';
     public $inglese = '';
@@ -16,22 +14,19 @@ new class extends Component {
 		#On['wordsUpdated', 'refresh']
     public function mount()
     {
-        // All words that are not archived
-				$userId = auth()->id();
-				$this->data = auth()->user()->words()->wherePivot('archived', false)->get()->toArray();      
-				$this->archiveCount = auth()->user()->words()->wherePivot('archived', true)->count();
-		
-				if (empty($this->data)) {
-					return;
-				}
-
 				$this->newWord();
     }
 
-
-		public function refreshComponent()
+		#[Computed]
+		public function data()
 		{
-			$this->mount();
+				return auth()->user()->words()->wherePivot('archived', false)->get()->toArray();
+		}
+
+		#[Computed]
+		public function archiveCount()
+		{
+				return auth()->user()->words()->wherePivot('archived', true)->count();
 		}
 
     public function newWord()
@@ -55,13 +50,12 @@ new class extends Component {
 			// Update the pivot table to set 'archived' to true
 			$user->words()->updateExistingPivot($word->id, ['archived' => true]);
 			$this->newWord();
-			$this->dispatch('wordsUpdated');
     }
 }; ?>
 
 <main x-data="words()">
 
-		@if (!empty($data))
+		@if (!empty($this->data))
 			<h1 class="text-center min-h-[70px] mt-12 text-5xl text-white">{{ $italiano }}</h1>
 
 			<div class="space-y-4 mt-8">
