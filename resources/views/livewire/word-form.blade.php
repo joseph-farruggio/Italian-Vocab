@@ -37,8 +37,7 @@ new class extends Component {
         $jsonExample = [
             'italiano' => 'Essere',
             'english' => 'To be',
-            'sentences' => ['Io sono un uomo.', 'Tu sei una donna.'],
-            'type' => 'verb',
+            'sentences' => ['Io sono un uomo.', 'Tu sei una donna.']
         ];
 
         $instructions = "Your response should only be JSON with no comments or ticks (```). Translate the word and return JSON matching the example: ";
@@ -80,14 +79,14 @@ new class extends Component {
             throw new \Exception('Your response is not JSON.');
         }
 
-        $requiredKeys = ['italiano', 'english', 'sentences', 'type'];
+        $requiredKeys = ['italiano', 'english', 'sentences'];
         foreach ($requiredKeys as $key) {
             if (!isset($decodedJson[$key])) {
                 throw new \Exception("Your JSON is missing the required key: $key.");
             }
         }
 
-        if (!is_string($decodedJson['italiano']) || !is_string($decodedJson['english']) || !is_array($decodedJson['sentences']) || !is_string($decodedJson['type'])) {
+        if (!is_string($decodedJson['italiano']) || !is_string($decodedJson['english']) || !is_array($decodedJson['sentences'])) {
             throw new \Exception('One or more of your JSON values are not the correct type.');
         }
 

@@ -32,7 +32,11 @@ new class extends Component
         @if (Auth::check())
             <x-nav-link href="{{ route('words') }}">Study Words</x-nav-link>
             <x-nav-link href="{{ route('add-words') }}">Add Words</x-nav-link>
-            <x-nav-link href="{{ route('archived-words') }}">Archived Words</x-nav-link>
+            <div class="flex items-center gap-2">
+                <x-nav-link href="{{ route('active-words') }}">Active Words</x-nav-link>
+                /
+                <x-nav-link href="{{ route('archived-words') }}" class="whitespace-nowrap">Archived Words</x-nav-link>
+            </div>
 
             <button wire:click="logout" class="text-white text-xl py-2 px-4 rounded-lg mx-auto w-full transition-colors text-center">Logout</button>
         @else
